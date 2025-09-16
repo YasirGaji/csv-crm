@@ -2,19 +2,25 @@ import { useState } from 'react';
 import FileUpload from './components/FileUpload';
 import EditableTable from './components/EditableTable';
 import ValidationErrors from './components/ValidationErrors';
-import { StringsRow, ClassificationRow, ValidationResult } from './types';
 import './App.css';
+import type { ClassificationRow, StringsRow, ValidationResult } from './types';
 
 const API_BASE = 'http://localhost:3001/api';
 
 function App() {
   const [stringsData, setStringsData] = useState<StringsRow[]>([]);
-  const [classificationsData, setClassificationsData] = useState<ClassificationRow[]>([]);
-  const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
+  const [classificationsData, setClassificationsData] = useState<
+    ClassificationRow[]
+  >([]);
+  const [validationResult, setValidationResult] =
+    useState<ValidationResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [filesUploaded, setFilesUploaded] = useState(false);
 
-  const handleFilesUpload = async (stringsFile: File, classificationsFile: File) => {
+  const handleFilesUpload = async (
+    stringsFile: File,
+    classificationsFile: File
+  ) => {
     setLoading(true);
     const formData = new FormData();
     formData.append('stringsFile', stringsFile);
@@ -27,7 +33,7 @@ function App() {
       });
 
       const result = await response.json();
-      
+
       if (result.success) {
         setStringsData(result.data.strings);
         setClassificationsData(result.data.classifications);
@@ -43,9 +49,12 @@ function App() {
     }
   };
 
-  const handleDataUpdate = async (type: 'strings' | 'classifications', data: StringsRow[] | ClassificationRow[]) => {
+  const handleDataUpdate = async (
+    type: 'strings' | 'classifications',
+    data: StringsRow[] | ClassificationRow[]
+  ) => {
     setLoading(true);
-    
+
     try {
       const response = await fetch(`${API_BASE}/data/${type}`, {
         method: 'PUT',
@@ -56,7 +65,7 @@ function App() {
       });
 
       const result = await response.json();
-      
+
       if (result.success) {
         if (type === 'strings') {
           setStringsData(data as StringsRow[]);
@@ -101,10 +110,14 @@ function App() {
           <FileUpload onFilesUpload={handleFilesUpload} loading={loading} />
         ) : (
           <div className="data-management">
+            {validationResult && !validationResult.isValid && (
+              <ValidationErrors errors={validationResult.errors} />
+            )}
+
             <div className="table-section">
               <div className="table-header">
                 <h2>Strings Data</h2>
-                <button 
+                <button
                   onClick={() => handleExport('strings')}
                   className="export-btn"
                   disabled={loading}
@@ -123,7 +136,7 @@ function App() {
             <div className="table-section">
               <div className="table-header">
                 <h2>Classifications Data</h2>
-                <button 
+                <button
                   onClick={() => handleExport('classifications')}
                   className="export-btn"
                   disabled={loading}
@@ -133,17 +146,15 @@ function App() {
               </div>
               <EditableTable
                 data={classificationsData}
-                onDataChange={(data) => handleDataUpdate('classifications', data)}
+                onDataChange={(data) =>
+                  handleDataUpdate('classifications', data)
+                }
                 type="classifications"
                 loading={loading}
               />
             </div>
 
-            {validationResult && !validationResult.isValid && (
-              <ValidationErrors errors={validationResult.errors} />
-            )}
-
-            <button 
+            <button
               onClick={() => setFilesUploaded(false)}
               className="reset-btn"
             >

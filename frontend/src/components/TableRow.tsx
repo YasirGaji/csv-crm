@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { StringsRow, ClassificationRow } from '../types';
+import type { ClassificationRow, StringsRow } from '../types';
 
 interface TableRowProps {
   data: StringsRow | ClassificationRow;

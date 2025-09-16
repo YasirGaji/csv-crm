@@ -1,4 +1,4 @@
-import { ValidationError } from '../types';
+import type { ValidationError } from "../types";
 
 interface ValidationErrorsProps {
   errors: ValidationError[];
