@@ -7,16 +7,29 @@ interface EditableTableProps {
   onDataChange: (data: StringsRow[] | ClassificationRow[]) => void;
   type: 'strings' | 'classifications';
   loading: boolean;
+  validationErrors?: { rowIndex: number; field: string; message: string }[];
 }
 
 const getTableHeaders = (type: 'strings' | 'classifications'): string[] => {
   if (type === 'strings') {
-    return ['Tier', 'Industry', 'Topic', 'Subtopic', 'Prefix', 'Fuzzing-Idx', 'Prompt', 'Risks', 'Keywords'];
+    return [
+      'Tier',
+      'Industry',
+      'Topic',
+      'Subtopic',
+      'Prefix',
+      'Fuzzing-Idx',
+      'Prompt',
+      'Risks',
+      'Keywords',
+    ];
   }
   return ['Topic', 'SubTopic', 'Industry', 'Classification'];
 };
 
-const createEmptyRow = (type: 'strings' | 'classifications'): StringsRow | ClassificationRow => {
+const createEmptyRow = (
+  type: 'strings' | 'classifications'
+): StringsRow | ClassificationRow => {
   if (type === 'strings') {
     return {
       Tier: 1,
@@ -38,13 +51,26 @@ const createEmptyRow = (type: 'strings' | 'classifications'): StringsRow | Class
   } as ClassificationRow;
 };
 
-function EditableTable({ data, onDataChange, type, loading }: EditableTableProps) {
+function EditableTable({
+  data,
+  onDataChange,
+  type,
+  loading,
+  validationErrors = [],
+}: EditableTableProps) {
   const [localData, setLocalData] = useState(data);
   const [hasChanges, setHasChanges] = useState(false);
-  
+
   const headers = getTableHeaders(type);
 
-  const handleRowChange = (index: number, updatedRow: StringsRow | ClassificationRow) => {
+  const isRowInvalid = (rowIndex: number) => {
+    return validationErrors.some((error) => error.rowIndex === rowIndex);
+  };
+
+  const handleRowChange = (
+    index: number,
+    updatedRow: StringsRow | ClassificationRow
+  ) => {
     const newData = [...localData];
     newData[index] = updatedRow;
     setLocalData(newData);
@@ -59,8 +85,8 @@ function EditableTable({ data, onDataChange, type, loading }: EditableTableProps
   };
 
   const handleDeleteRow = (index: number) => {
-    if (localData.length <= 1) return; // Keep at least one row
-    
+    if (localData.length <= 1) return;
+
     const newData = localData.filter((_, i) => i !== index);
     setLocalData(newData);
     setHasChanges(true);
@@ -83,6 +109,42 @@ function EditableTable({ data, onDataChange, type, loading }: EditableTableProps
 
   return (
     <div className="editable-table">
+      <div className="table-info">
+        <span className="row-count">{localData.length} rows</span>
+        {hasChanges && (
+          <span className="changes-indicator">• Unsaved changes</span>
+        )}
+      </div>
+
+      <div className="table-actions">
+        <button
+          onClick={handleAddRow}
+          className="add-row-btn"
+          disabled={loading}
+        >
+          Add Row
+        </button>
+
+        {hasChanges && (
+          <div className="change-actions">
+            <button
+              onClick={handleSaveChanges}
+              className="save-btn"
+              disabled={loading}
+            >
+              {loading ? 'Saving...' : 'Save Changes'}
+            </button>
+            <button
+              onClick={handleDiscardChanges}
+              className="discard-btn"
+              disabled={loading}
+            >
+              Discard Changes
+            </button>
+          </div>
+        )}
+      </div>
+
       <div className="table-container">
         <table className="data-table">
           <thead>
@@ -102,6 +164,11 @@ function EditableTable({ data, onDataChange, type, loading }: EditableTableProps
                 onDelete={() => handleDeleteRow(index)}
                 type={type}
                 canDelete={localData.length > 1}
+                isInvalid={isRowInvalid(index)}
+                validationError={
+                  validationErrors.find((error) => error.rowIndex === index)
+                    ?.message
+                }
               />
             ))}
           </tbody>
@@ -139,7 +206,9 @@ function EditableTable({ data, onDataChange, type, loading }: EditableTableProps
 
       <div className="table-info">
         <span className="row-count">{localData.length} rows</span>
-        {hasChanges && <span className="changes-indicator">• Unsaved changes</span>}
+        {hasChanges && (
+          <span className="changes-indicator">• Unsaved changes</span>
+        )}
       </div>
     </div>
   );

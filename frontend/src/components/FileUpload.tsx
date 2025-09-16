@@ -3,11 +3,18 @@ import { useState } from 'react';
 interface FileUploadProps {
   onFilesUpload: (stringsFile: File, classificationsFile: File) => void;
   loading: boolean;
+  serverError?: string;
 }
 
-function FileUpload({ onFilesUpload, loading }: FileUploadProps) {
+function FileUpload({
+  onFilesUpload,
+  loading,
+  serverError = '',
+}: FileUploadProps) {
   const [stringsFile, setStringsFile] = useState<File | null>(null);
-  const [classificationsFile, setClassificationsFile] = useState<File | null>(null);
+  const [classificationsFile, setClassificationsFile] = useState<File | null>(
+    null
+  );
   const [error, setError] = useState<string>('');
 
   const validateFile = (file: File): boolean => {
@@ -15,7 +22,8 @@ function FileUpload({ onFilesUpload, loading }: FileUploadProps) {
       setError('Only CSV files are allowed');
       return false;
     }
-    if (file.size > 10 * 1024 * 1024) { // 10MB limit
+    if (file.size > 10 * 1024 * 1024) {
+      // 10MB limit
       setError('File size must be less than 10MB');
       return false;
     }
@@ -30,7 +38,9 @@ function FileUpload({ onFilesUpload, loading }: FileUploadProps) {
     }
   };
 
-  const handleClassificationsFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleClassificationsFileChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = e.target.files?.[0];
     if (file && validateFile(file)) {
       setClassificationsFile(file);
@@ -52,6 +62,10 @@ function FileUpload({ onFilesUpload, loading }: FileUploadProps) {
 
   return (
     <div className="file-upload">
+      {(error || serverError) && (
+        <div className="error-message">{serverError || error}</div>
+      )}
+
       <div className="upload-instructions">
         <h2>Upload CSV Files</h2>
         <p>Select both CSV files to begin editing and validation.</p>
@@ -61,7 +75,10 @@ function FileUpload({ onFilesUpload, loading }: FileUploadProps) {
         <div className="file-input-group">
           <label htmlFor="strings-file" className="file-label">
             Strings CSV File
-            <small>Fields: Tier, Industry, Topic, Subtopic, Prefix, Fuzzing-Idx, Prompt, Risks, Keywords</small>
+            <small>
+              Fields: Tier, Industry, Topic, Subtopic, Prefix, Fuzzing-Idx,
+              Prompt, Risks, Keywords
+            </small>
           </label>
           <input
             id="strings-file"
@@ -93,7 +110,8 @@ function FileUpload({ onFilesUpload, loading }: FileUploadProps) {
           />
           {classificationsFile && (
             <div className="file-selected">
-              ✓ {classificationsFile.name} ({(classificationsFile.size / 1024).toFixed(1)} KB)
+              ✓ {classificationsFile.name} (
+              {(classificationsFile.size / 1024).toFixed(1)} KB)
             </div>
           )}
         </div>

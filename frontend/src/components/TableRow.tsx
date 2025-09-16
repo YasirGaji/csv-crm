@@ -7,9 +7,11 @@ interface TableRowProps {
   onDelete: () => void;
   type: 'strings' | 'classifications';
   canDelete: boolean;
+  isInvalid?: boolean;
+  validationError?: string;
 }
 
-function TableRow({ data, onChange, onDelete, type, canDelete }: TableRowProps) {
+function TableRow({ data, onChange, onDelete, type, canDelete, isInvalid = false, validationError }: TableRowProps) {
   const [editingCell, setEditingCell] = useState<string | null>(null);
   const [tempValue, setTempValue] = useState<string>('');
 
@@ -88,7 +90,7 @@ function TableRow({ data, onChange, onDelete, type, canDelete }: TableRowProps) 
   const fieldNames = getFieldNames(type);
 
   return (
-    <tr className="table-row">
+  <tr className={`table-row ${isInvalid ? 'invalid-row' : ''}`}>
       {fieldNames.map((fieldName) => (
         <td key={fieldName} className="table-cell">
           {renderCell(fieldName)}

@@ -16,12 +16,15 @@ function App() {
     useState<ValidationResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [filesUploaded, setFilesUploaded] = useState(false);
+  const [uploadError, setUploadError] = useState<string>('');
 
   const handleFilesUpload = async (
     stringsFile: File,
     classificationsFile: File
   ) => {
     setLoading(true);
+    setUploadError('');
+
     const formData = new FormData();
     formData.append('stringsFile', stringsFile);
     formData.append('classificationsFile', classificationsFile);
@@ -39,11 +42,16 @@ function App() {
         setClassificationsData(result.data.classifications);
         setFilesUploaded(true);
         setValidationResult(null);
+        setUploadError('');
       } else {
-        console.error('Upload failed:', result.message);
+        setUploadError(
+          result.message || 'Upload failed. Please check your CSV files.'
+        );
       }
     } catch (error) {
-      console.error('Upload error:', error);
+      setUploadError(
+        'Network error. Please check your connection and try again.'
+      );
     } finally {
       setLoading(false);
     }
@@ -101,13 +109,18 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>Knostic CSV Manager</h1>
+        <h1>Knostic CSV Manager Assessment</h1>
         <p>Upload, edit, validate, and export CSV files</p>
+        <p>By Yasir Gaji</p>
       </header>
 
       <main className="app-main">
         {!filesUploaded ? (
-          <FileUpload onFilesUpload={handleFilesUpload} loading={loading} />
+          <FileUpload
+            onFilesUpload={handleFilesUpload}
+            loading={loading}
+            serverError={uploadError}
+          />
         ) : (
           <div className="data-management">
             {validationResult && !validationResult.isValid && (
@@ -130,6 +143,7 @@ function App() {
                 onDataChange={(data) => handleDataUpdate('strings', data)}
                 type="strings"
                 loading={loading}
+                validationErrors={validationResult?.errors || []}
               />
             </div>
 
@@ -151,6 +165,7 @@ function App() {
                 }
                 type="classifications"
                 loading={loading}
+                validationErrors={validationResult?.errors || []}
               />
             </div>
 
