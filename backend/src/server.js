@@ -1,52 +1,60 @@
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import csvRoutes from './routes/csv.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Get __dirname equivalent in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 // Middleware
-app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? process.env.FRONTEND_URL 
-    : 'http://localhost:5173'
-}));
-
+app.use(cors());
 app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Routes
+// API Routes
 app.use('/api', csvRoutes);
 
-// Health check endpoint
+// Health check
 app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
-    timestamp: new Date().toISOString(),
-    service: 'knostic-csv-backend'
-  });
+  res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-// Error handling middleware
+// Serve React app static files (production)
+if (process.env.NODE_ENV === 'production') {
+  const frontendPath = path.join(__dirname, 'frontend-dist');
+  app.use(express.static(frontendPath));
+  
+  // Handle client-side routing - serve index.html for non-API routes
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'index.html'));
+  });
+}
+
+// Error handling
 app.use((err, req, res, next) => {
-  console.error('Error:', err);
+  console.error(err.stack);
   res.status(500).json({
     success: false,
-    message: err.message || 'Internal server error'
+    message: 'Something went wrong!',
+    error: process.env.NODE_ENV === 'development' ? err.message : undefined
   });
 });
 
-// 404 handler
-app.use((req, res) => {
+// 404 handler for API routes only
+app.use('/api/*', (req, res) => {
   res.status(404).json({
     success: false,
-    message: 'Endpoint not found'
+    message: 'API route not found'
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📊 CSV API available at http://localhost:${PORT}/api`);
+const server = app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });
 
-export default app;
+export default server;

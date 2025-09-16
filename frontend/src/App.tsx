@@ -5,7 +5,7 @@ import ValidationErrors from './components/ValidationErrors';
 import './App.css';
 import type { ClassificationRow, StringsRow, ValidationResult } from './types';
 
-const API_BASE = 'http://localhost:3001/api';
+const API_BASE = process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3001/api';
 
 function App() {
   const [stringsData, setStringsData] = useState<StringsRow[]>([]);

@@ -1,0 +1,42 @@
+# Node modules
+**/node_modules
+**/npm-debug.log*
+
+# Build outputs
+**/dist
+**/build
+**/coverage
+
+# Development files
+**/.git
+**/.gitignore
+**/README.md
+**/.env
+**/.env.local
+**/.env.*.local
+
+# IDE files
+**/.vscode
+**/.idea
+**/*.swp
+**/*.swo
+
+# OS files
+**/.DS_Store
+**/Thumbs.db
+
+# Test files
+**/tests
+**/*.test.js
+**/*.test.tsx
+**/test
+
+# Development configs
+**/eslint.config.js
+**/vite.config.ts
+**/tsconfig*.json
+**/.eslintrc*
+
+# Logs
+**/logs
+**/*.log
