@@ -117,6 +117,9 @@ npm run test:watch  # Run tests in watch mode
   - **Classifications CSV**: Topic, SubTopic, Industry, Classification
 - Click "Upload Files"
 
+<img width="1680" height="1050" alt="Screenshot 2025-09-17 at 08 17 48" src="https://github.com/user-attachments/assets/8dee4557-4bb6-4e9e-922f-9ef1df649f73" />
+
+
 ### 2. Edit Data
 - **Edit cells**: Click any cell to edit its value
 - **Add rows**: Click "Add Row" to insert new rows
@@ -124,14 +127,23 @@ npm run test:watch  # Run tests in watch mode
 - **Save changes**: Click "Save Changes" to apply modifications
 - **Discard changes**: Click "Discard Changes" to revert
 
+<img width="1680" height="1050" alt="Screenshot 2025-09-17 at 08 18 55" src="https://github.com/user-attachments/assets/9f27c0a4-e9ed-4b69-b0db-075d1389c0cb" />
+
+
 ### 3. Data Validation
 - The system validates that every Topic + SubTopic + Industry combination in strings.csv exists in classifications.csv
 - Invalid rows are highlighted in red with error messages
 - You cannot save data with validation errors
 
+<img width="1680" height="1050" alt="Screenshot 2025-09-17 at 08 19 56" src="https://github.com/user-attachments/assets/68f58eb1-504d-4c6f-8b86-3b45f90d3ab6" />
+
+
 ### 4. Export Data
 - Click "Export Strings CSV" or "Export Classifications CSV" to download updated files
 - Files are downloaded with your modifications
+
+<img width="1680" height="1050" alt="Screenshot 2025-09-17 at 08 20 54" src="https://github.com/user-attachments/assets/2b64a388-9959-49b2-8a90-642b0c8f5810" />
+
 
 ## API Endpoints
 
